@@ -1,1 +1,7 @@
-
+---
+name: ItemFram-Blocker
+version: 0.0.1
+main: AmitxD\ItemFram_Blocker\Main
+api: 4.20.2
+src-namespace-prefix: AmitxD\ItemFram_Blocker
+...
