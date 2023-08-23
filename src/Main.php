@@ -10,10 +10,8 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\block\BlockIds;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
+use pocketmine\item\VanillaItems;
+use pocketmine\item\ItemTypeIds;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat as TF;
@@ -26,34 +24,41 @@ class Main extends PluginBase implements Listener{
     
     public function onCraftItem(CraftItemEvent $event): void {
         foreach($event->getRecipe()->getResults() as $results) {
-            if($results->getId() === ItemIds::ITEM_FRAME) {
+            if($results->getTypeId() === ItemTypeIds::ITEM_FRAME) {
                 $event->cancel();
             }
         }
     }
+    
     public function onInteract(PlayerInteractEvent $event)
     {
         $player = $event->getPlayer();
         $block = $event->getBlock();
-        if ($block->getId() === BlockLegacyIds::FRAME_BLOCK) {
+        if ($block->getTypeId() === ItemTypeIds::FRAME_BLOCK) {
         $player->sendMessage(TF::RED . "You can't use item frames here!");
         $event->cancel();
         }
     }
+    
     public function onPlace(BlockPlaceEvent $event): void {
         $player = $event->getPlayer();
+        foreach($event->getTransaction()->getBlocks() as [$x, $y, $z, $block]){
         $block = $event->getBlock();
-        if($block->getId() === BlockLegacyIds::FRAME_BLOCK) {
+        if($block->getTypeId() === ItemTypeIds::FRAME_BLOCK) {
             $event->cancel();
             $player->sendMessage(TF::RED . "Placing item frames is disabled!");
         }
+      }
     }
+    
     public function onBreak(BlockBreakEvent $event): void {
         $block = $event->getBlock();
-        if ($block->getId() === BlockLegacyIds::FRAME_BLOCK) {
+        $blockPos = $block->getPosition();
+        if ($block->getTypeId() === ItemTypeIds::FRAME_BLOCK) {
             $event->cancel();
-            $AIRID = BlockLegacyIds::AIR;
-            $block->getPosition()->getWorld()->setBlock($block->getPosition(), BlockFactory::getInstance()->get($AIRID, 0));
+            $Air = VanillaItems::AIR()->getBlock();
+            $AIRID = ItemTypeIds::AIR;
+            $blockPos->getWorld()->setBlock($blockPos,$Air);
         }
     }
 }
